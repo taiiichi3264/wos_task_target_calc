@@ -3,14 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>【最終調整版】タスク開始日時計算ツール</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigi<!DOCTYPE html>
-<html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>【最終FIX版 v2】タスク開始日時計算ツール</title>
+    <title>【最終FIX版 v4】タスク開始日時計算ツール</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -109,10 +102,9 @@
         gap: 6px;
       }
 
-      /* ▼▼▼ 修正箇所：時間入力欄のレイアウト調整 ▼▼▼ */
       .time-input-container {
         display: grid;
-        grid-template-columns: 1fr 1fr 1fr; /* 3つの要素を均等に配置 */
+        grid-template-columns: 1fr 1fr 1fr;
         gap: 6px;
         align-items: center;
       }
@@ -131,7 +123,6 @@
       .time-input-group .unit-label.separator {
         font-weight: bold;
       }
-      /* ▲▲▲ 修正箇所 ▲▲▲ */
 
       .type-selector {
         display: flex;
@@ -258,17 +249,19 @@
         width: 100%;
         border-collapse: collapse;
       }
+
+      /* ▼▼▼ 修正箇所：テーブルの余白とフォントサイズを微調整 ▼▼▼ */
       .history-table td {
-        padding: 10px 8px;
+        padding: 10px 3px; /* 左右の余白をさらに詰める */
         border-bottom: 1px solid var(--border-color);
         text-align: right;
-        font-size: 0.85em;
-        white-space: pre;
+        font-size: 0.82em; /* フォントを僅かに小さく */
+        white-space: nowrap; /* すべてのセルで改行を禁止 */
       }
       .history-table th {
-        padding: 10px 8px;
+        padding: 10px 3px;
         border-bottom: 1px solid var(--border-color);
-        font-size: 0.85em;
+        font-size: 0.82em;
         background-color: #f8f9fa;
         font-weight: 700;
         position: sticky;
@@ -279,9 +272,7 @@
       .history-table td:first-child {
         text-align: center;
       }
-      .history-table td:nth-child(2) {
-        white-space: nowrap;
-      }
+      /* ▲▲▲ 修正箇所 ▲▲▲ */
 
       @keyframes highlight-and-fade {
         0% {
@@ -402,7 +393,6 @@
     </div>
 
     <script>
-      // JavaScriptに変更はありません
       document.addEventListener("DOMContentLoaded", () => {
         const UIElements = {
           pages: {
@@ -433,7 +423,7 @@
             ),
           },
         };
-        const HISTORY_KEY = "taskStartTimeHistory_v5";
+        const HISTORY_KEY = "taskStartTimeHistory_v6";
         let selectedType = "建築";
         const historyService = {
           get: () => JSON.parse(localStorage.getItem(HISTORY_KEY)) || [],
@@ -560,577 +550,17 @@
         }
         const formatDuration = (d, h, m) =>
           `${d}d ${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+
+        // ▼▼▼ 修正箇所：日付フォーマットから曜日を削除 ▼▼▼
         const formatShortDate = (date) => {
-          const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
           const mo = String(date.getMonth() + 1).padStart(2, "0");
           const d = String(date.getDate()).padStart(2, "0");
-          const day = weekdays[date.getDay()];
           const h = String(date.getHours()).padStart(2, "0");
           const m = String(date.getMinutes()).padStart(2, "0");
-          return `${mo}/${d} (${day}) ${h}:${m}`;
+          return `${mo}/${d} ${h}:${m}`; // (曜) を削除
         };
-        UIElements.buttons.calc.addEventListener("click", handleCalculation);
-        UIElements.buttons.reset.addEventListener("click", UI.resetForm);
-        UIElements.buttons.showHistory.addEventListener("click", () =>
-          UI.showPage("history")
-        );
-        UIElements.buttons.back.addEventListener("click", () =>
-          UI.showPage("calc")
-        );
-        UIElements.buttons.clearHistory.addEventListener(
-          "click",
-          handleClearHistory
-        );
-        UIElements.buttons.typeButtons.forEach((button) =>
-          button.addEventListener("click", () => UI.updateTypeSelection(button))
-        );
-        UI.renderHistory();
-      });
-    </script>
-  </body>
-</html>
-n />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      :root {
-        --primary-color: #007bff;
-        --secondary-color: #6c757d;
-        --danger-color: #dc3545;
-        --background-color: #f0f2f5;
-        --surface-color: #ffffff;
-        --text-color: #333;
-        --border-color: #ddd;
-        --border-radius: 8px;
-        --font-family: "Noto Sans JP", sans-serif;
-        --highlight-color: #e0f7ff;
-      }
+        // ▲▲▲ 修正箇所 ▲▲▲
 
-      html,
-      body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        font-family: var(--font-family);
-        background-color: var(--background-color);
-      }
-
-      .container {
-        max-width: 400px;
-        height: 100%;
-        margin: 0 auto;
-        background-color: var(--surface-color);
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-      }
-
-      .content-wrapper {
-        flex-grow: 1;
-        min-height: 0;
-      }
-
-      .page {
-        height: 100%;
-        padding: 15px;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-      }
-      .page.hidden {
-        display: none;
-      }
-
-      .calc-form {
-        flex-shrink: 0;
-      }
-
-      .page-title {
-        text-align: center;
-        color: var(--text-color);
-        margin-top: 0;
-        margin-bottom: 16px;
-        font-size: 1.4em;
-      }
-
-      .input-group {
-        margin-bottom: 10px;
-      }
-
-      label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: 700;
-        font-size: 0.9em;
-      }
-
-      input[type="number"],
-      input[type="date"],
-      input[type="time"] {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid var(--border-color);
-        border-radius: var(--border-radius);
-        box-sizing: border-box;
-        font-size: 1em;
-        font-family: var(--font-family);
-        background-color: #fff;
-      }
-      .datetime-input-container,
-      .time-input-container {
-        display: flex;
-        gap: 8px;
-      }
-      .time-input-group {
-        flex: 1;
-      }
-
-      .type-selector {
-        display: flex;
-        gap: 8px;
-      }
-      .type-btn {
-        flex: 1;
-        padding: 8px;
-        font-size: 0.9em;
-        text-align: center;
-        border: 1px solid var(--border-color);
-        border-radius: var(--border-radius);
-        background-color: #f8f9fa;
-        color: var(--text-color);
-        cursor: pointer;
-        transition: all 0.2s;
-      }
-      .type-btn.active {
-        background-color: var(--primary-color);
-        color: white;
-        border-color: var(--primary-color);
-      }
-
-      .button-group {
-        display: flex;
-        gap: 10px;
-        margin-top: 12px;
-      }
-      .btn {
-        width: 100%;
-        padding: 10px;
-        color: white;
-        border: none;
-        border-radius: var(--border-radius);
-        font-size: 1em;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.1s ease-in-out;
-        font-family: var(--font-family);
-      }
-      .btn-primary {
-        background-color: var(--primary-color);
-      }
-      .btn-secondary {
-        background-color: var(--secondary-color);
-      }
-
-      .btn:active {
-        transform: scale(0.98);
-        filter: brightness(0.9);
-      }
-
-      .result-box {
-        margin-top: 12px;
-        background-color: #e9ecef;
-        padding: 10px;
-        border-radius: var(--border-radius);
-        text-align: center;
-        font-size: 1.1em;
-        font-weight: 700;
-      }
-
-      .history-section {
-        margin-top: 16px;
-        padding-top: 16px;
-        border-top: 1px solid #eee;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-        min-height: 0;
-      }
-      .history-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 10px;
-        flex-shrink: 0;
-      }
-      .history-header h3 {
-        margin: 0;
-        font-size: 1.1em;
-      }
-      .history-link {
-        font-size: 0.8em;
-        color: var(--primary-color);
-        cursor: pointer;
-        border: none;
-        background: none;
-        padding: 5px;
-      }
-
-      /* ▼▼▼ 修正箇所1：履歴ヘッダーの垂直位置を調整 ▼▼▼ */
-      .full-history-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center; /* Flexboxで垂直中央揃え */
-        margin-bottom: 16px;
-        flex-shrink: 0;
-      }
-      .full-history-header .page-title {
-        margin: 0; /* h1のデフォルトマージンをリセットしてズレをなくす */
-      }
-      /* ▲▲▲ 修正箇所1 ▲▲▲ */
-
-      .btn-back {
-        font-size: 0.9em;
-        font-weight: 700;
-        color: var(--primary-color);
-        cursor: pointer;
-        background: none;
-        border: 1px solid var(--primary-color);
-        border-radius: 5px;
-        padding: 6px 12px;
-      }
-      .btn-clear-history {
-        color: var(--danger-color);
-        border-color: var(--danger-color);
-      }
-
-      .table-container {
-        flex-grow: 1;
-        overflow-y: auto;
-        min-height: 0;
-      }
-      .history-table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-
-      .history-table td {
-        padding: 10px 8px;
-        border-bottom: 1px solid var(--border-color);
-        text-align: right;
-        font-size: 0.9em;
-        white-space: pre;
-      }
-
-      /* ▼▼▼ 修正箇所2：テーブルヘッダーを全て中央揃えに ▼▼▼ */
-      .history-table th {
-        padding: 10px 8px;
-        border-bottom: 1px solid var(--border-color);
-        font-size: 0.9em;
-        background-color: #f8f9fa;
-        font-weight: 700;
-        position: sticky;
-        top: 0;
-        text-align: center; /* すべてのヘッダーを中央揃え */
-        white-space: nowrap;
-      }
-      /* ▲▲▲ 修正箇所2 ▲▲▲ */
-
-      .history-table td:first-child {
-        text-align: center;
-      } /* 種別のデータのみ中央揃え */
-      .history-table td:nth-child(2) {
-        white-space: nowrap;
-      }
-
-      @keyframes highlight-and-fade {
-        0% {
-          background-color: var(--highlight-color);
-        }
-        100% {
-          background-color: transparent;
-        }
-      }
-      .history-table tr.new-entry {
-        animation: highlight-and-fade 1.5s ease-out forwards;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="content-wrapper">
-        <main id="page-calc" class="page">
-          <section class="calc-form">
-            <h1 class="page-title">タスク開始日時計算</h1>
-            <div class="input-group">
-              <label for="target-date">目標日時</label>
-              <div class="datetime-input-container">
-                <input type="date" id="target-date" />
-                <input type="time" id="target-time" value="09:00" />
-              </div>
-            </div>
-            <div class="input-group">
-              <label>種別</label>
-              <div class="type-selector">
-                <button type="button" class="type-btn active" data-type="建築">
-                  建築
-                </button>
-                <button type="button" class="type-btn" data-type="訓練">
-                  訓練
-                </button>
-                <button type="button" class="type-btn" data-type="研究">
-                  研究
-                </button>
-                <button type="button" class="type-btn" data-type="その他">
-                  その他
-                </button>
-              </div>
-            </div>
-            <div class="input-group">
-              <label>所要時間</label>
-              <div class="time-input-container">
-                <div class="time-input-group">
-                  <input type="number" id="duration-days" placeholder="日" />
-                </div>
-                <div class="time-input-group">
-                  <input type="number" id="duration-hours" placeholder="時間" />
-                </div>
-                <div class="time-input-group">
-                  <input type="number" id="duration-minutes" placeholder="分" />
-                </div>
-              </div>
-            </div>
-            <div class="button-group">
-              <button id="btn-reset" class="btn btn-secondary">リセット</button>
-              <button id="btn-calc" class="btn btn-primary">計算</button>
-            </div>
-            <div id="result-box" class="result-box">
-              ここに開始日時が表示されます
-            </div>
-          </section>
-          <section class="history-section">
-            <header class="history-header">
-              <h3>直近の履歴</h3>
-              <button id="btn-show-history" class="history-link">
-                すべての履歴を見る &gt;
-              </button>
-            </header>
-            <div class="table-container">
-              <table class="history-table">
-                <thead>
-                  <tr>
-                    <th>種別</th>
-                    <th>目標日時</th>
-                    <th>所要時間</th>
-                    <th>開始日時</th>
-                  </tr>
-                </thead>
-                <tbody id="recent-history-body"></tbody>
-              </table>
-            </div>
-          </section>
-        </main>
-
-        <section id="page-history" class="page hidden">
-          <header class="full-history-header">
-            <button id="btn-back" class="btn-back">&lt; 戻る</button>
-            <h1 class="page-title">すべての履歴</h1>
-            <button
-              id="btn-clear-history"
-              class="history-link btn-clear-history"
-            >
-              履歴を消去
-            </button>
-          </header>
-          <div class="table-container">
-            <table class="history-table">
-              <thead>
-                <tr>
-                  <th>種別</th>
-                  <th>目標日時</th>
-                  <th>所要時間</th>
-                  <th>開始日時</th>
-                </tr>
-              </thead>
-              <tbody id="full-history-body"></tbody>
-            </table>
-          </div>
-        </section>
-      </div>
-    </div>
-
-    <script>
-      // JavaScriptは前回のバージョンから変更ありません
-      document.addEventListener("DOMContentLoaded", () => {
-        const UIElements = {
-          pages: {
-            calc: document.getElementById("page-calc"),
-            history: document.getElementById("page-history"),
-          },
-          inputs: {
-            date: document.getElementById("target-date"),
-            time: document.getElementById("target-time"),
-            days: document.getElementById("duration-days"),
-            hours: document.getElementById("duration-hours"),
-            minutes: document.getElementById("duration-minutes"),
-          },
-          buttons: {
-            calc: document.getElementById("btn-calc"),
-            reset: document.getElementById("btn-reset"),
-            showHistory: document.getElementById("btn-show-history"),
-            back: document.getElementById("btn-back"),
-            clearHistory: document.getElementById("btn-clear-history"),
-            typeButtons: document.querySelectorAll(".type-btn"),
-          },
-          outputs: {
-            resultBox: document.getElementById("result-box"),
-            recentHistoryBody: document.getElementById("recent-history-body"),
-            fullHistoryBody: document.getElementById("full-history-body"),
-            recentHistoryContainer: document.querySelector(
-              "#page-calc .table-container"
-            ),
-          },
-        };
-        const HISTORY_KEY = "taskStartTimeHistory_v5";
-        let selectedType = "建築";
-        const historyService = {
-          get: () => JSON.parse(localStorage.getItem(HISTORY_KEY)) || [],
-          add: (entry) => {
-            let history = historyService.get();
-            history.unshift(entry);
-            if (history.length > 50) history.pop();
-            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-          },
-          clear: () => {
-            if (confirm("本当にすべての履歴を消去しますか？")) {
-              localStorage.removeItem(HISTORY_KEY);
-              return true;
-            }
-            return false;
-          },
-        };
-        const UI = {
-          showPage: (pageName) => {
-            Object.values(UIElements.pages).forEach((p) =>
-              p.classList.add("hidden")
-            );
-            UIElements.pages[pageName].classList.remove("hidden");
-          },
-          renderHistory: () => {
-            const history = historyService.get();
-            UI.populateHistoryTable(
-              UIElements.outputs.recentHistoryBody,
-              history.slice(0, 5)
-            );
-            UI.populateHistoryTable(
-              UIElements.outputs.fullHistoryBody,
-              history
-            );
-          },
-          populateHistoryTable: (tableBody, historyData) => {
-            if (!tableBody) return;
-            if (historyData.length === 0) {
-              tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">履歴はありません</td></tr>`;
-              return;
-            }
-            tableBody.innerHTML = historyData
-              .map((item) => {
-                const targetDate = new Date(item.target);
-                return `<tr><td>${item.type || "-"}</td><td>${formatShortDate(
-                  targetDate
-                )}</td><td>${formatDuration(
-                  item.days,
-                  item.hours,
-                  item.minutes
-                )}</td><td>${item.result}</td></tr>`;
-              })
-              .join("");
-          },
-          resetForm: () => {
-            Object.values(UIElements.inputs).forEach(
-              (input) => (input.value = "")
-            );
-            UIElements.inputs.time.value = "09:00";
-            UIElements.outputs.resultBox.textContent =
-              "ここに開始日時が表示されます";
-            selectedType = "建築";
-            UIElements.buttons.typeButtons.forEach((btn) =>
-              btn.classList.toggle("active", btn.dataset.type === selectedType)
-            );
-          },
-          updateTypeSelection: (clickedButton) => {
-            selectedType = clickedButton.dataset.type;
-            UIElements.buttons.typeButtons.forEach((btn) =>
-              btn.classList.remove("active")
-            );
-            clickedButton.classList.add("active");
-          },
-        };
-        function handleCalculation() {
-          const { date, time, days, hours, minutes } = UIElements.inputs;
-          if (!date.value || !time.value) {
-            UIElements.outputs.resultBox.textContent =
-              "目標日時を入力してください。";
-            return;
-          }
-          const d = parseInt(days.value) || 0;
-          const h = parseInt(hours.value) || 0;
-          const m = parseInt(minutes.value) || 0;
-          if (d === 0 && h === 0 && m === 0) {
-            UIElements.outputs.resultBox.textContent =
-              "所要時間を入力してください。";
-            return;
-          }
-          const targetDateTime = new Date(`${date.value}T${time.value}`);
-          const startDateTime = new Date(targetDateTime.getTime());
-          startDateTime.setDate(startDateTime.getDate() - d);
-          startDateTime.setHours(startDateTime.getHours() - h);
-          startDateTime.setMinutes(startDateTime.getMinutes() - m);
-          const resultText = formatShortDate(startDateTime);
-          UIElements.outputs.resultBox.textContent = `開始日時: ${resultText}`;
-          historyService.add({
-            target: targetDateTime.toISOString(),
-            type: selectedType,
-            days: d,
-            hours: h,
-            minutes: m,
-            result: resultText,
-          });
-          UI.renderHistory();
-          const newRow =
-            UIElements.outputs.recentHistoryBody.querySelector(
-              "tr:first-child"
-            );
-          if (newRow && !newRow.querySelector('td[colspan="4"]')) {
-            newRow.classList.add("new-entry");
-            setTimeout(() => {
-              newRow.classList.remove("new-entry");
-            }, 1500);
-          }
-          if (UIElements.outputs.recentHistoryContainer) {
-            UIElements.outputs.recentHistoryContainer.scrollTop = 0;
-          }
-        }
-        function handleClearHistory() {
-          if (historyService.clear()) {
-            UI.renderHistory();
-          }
-        }
-        const formatDuration = (d, h, m) =>
-          `${d}d ${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-        const formatShortDate = (date) => {
-          const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
-          const mo = String(date.getMonth() + 1).padStart(2, "0");
-          const d = String(date.getDate()).padStart(2, "0");
-          const day = weekdays[date.getDay()];
-          const h = String(date.getHours()).padStart(2, "0");
-          const m = String(date.getMinutes()).padStart(2, "0");
-          return `${mo}/${d} (${day}) ${h}:${m}`;
-        };
         UIElements.buttons.calc.addEventListener("click", handleCalculation);
         UIElements.buttons.reset.addEventListener("click", UI.resetForm);
         UIElements.buttons.showHistory.addEventListener("click", () =>
